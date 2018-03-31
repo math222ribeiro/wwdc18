@@ -1,7 +1,31 @@
 //#-hidden-code
 import PlaygroundSupport
 
+class Listener: PlaygroundRemoteLiveViewProxyDelegate {
+  var page: PlaygroundPage!
+  
+  func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy, received message: PlaygroundValue) {
+    guard case let .dictionary(dict) = message else { return }
+    if case let .string(hint)? = dict["fail"] {
+      page.assessmentStatus = .fail(hints: [hint, hint], solution: nil)
+    } else {
+      page.assessmentStatus = .pass(message: "**Great** job!")
+      page.finishExecution()
+    }
+  
+  }
+  
+  func remoteLiveViewProxyConnectionClosed(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy) {
+    
+  }
+}
+
 let page = PlaygroundPage.current
+let proxy = page.liveView as! PlaygroundRemoteLiveViewProxy
+let listener = Listener()
+listener.page = page
+proxy.delegate = listener
+
 
 /*
   User Interface to interact with the playground.
@@ -39,9 +63,7 @@ public struct Robot {
 
 func createRobot() {
   if !RobotsManager.shared.canCreateRobot { return }
-  if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
-    proxy.send(.dictionary(robot.robotDictionary))
-  }
+  proxy.send(.dictionary(robot.robotDictionary))
 }
 //#-end-hidden-code
 

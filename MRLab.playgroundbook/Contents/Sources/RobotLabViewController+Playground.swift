@@ -25,11 +25,19 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
       // Save the dictionary value to store on PlaygroundKeyValueStore later.
       robotDictionary = dictionary
       
-      robotHead = parseRobotConfig(head)
-      robotBody = parseRobotConfig(body)
-      robotArmLeft = parseRobotConfig(armLeft)
-      robotArmRight = parseRobotConfig(armRight)
-      robotLeg = parseRobotConfig(leg)
+      guard let headConfig = parseRobotConfig(head), let bodyConfig = parseRobotConfig(body), let armLeftConfig = parseRobotConfig(armLeft),
+        let armRightConfig = parseRobotConfig(armRight), let legConfig = parseRobotConfig(leg) else {
+          var error = [String: PlaygroundValue]()
+          error["fail"] = .string("HINT HERE")
+          send(.dictionary(error))
+          return
+      }
+      
+      robotHead = headConfig
+      robotBody = bodyConfig
+      robotArmLeft = armLeftConfig
+      robotArmRight = armRightConfig
+      robotLeg = legConfig
       
     default:
       fatalError("NO DICTIONARY")
@@ -61,7 +69,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
     PlaygroundKeyValueStore.current["robot"] = .dictionary(robotDictionary)
   }
   
-  public func parseRobotConfig(_ config: String) -> (name: RobotNode.Name, color: RobotNode.Color) {
+  public func parseRobotConfig(_ config: String) -> (name: RobotNode.Name, color: RobotNode.Color)? {
     let components = config.components(separatedBy: ";")
     
     if components.count != 2 {
@@ -97,6 +105,9 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
       fatalError("NAME WHAT?")
     }
     
+    if name == .boxBot && color == .blue {
+      return nil
+    }
     return (name, color)
   }
 
