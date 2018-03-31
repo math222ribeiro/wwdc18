@@ -6,6 +6,7 @@
 
 import SceneKit
 
+// Singleton that handles the robot change on the scene.
 public class RobotsManager {
   
   /// Singleton instance.
@@ -122,12 +123,12 @@ public extension RobotsManager {
   
   public func changeArms(_ oldArms: [SCNNode], to newArms: [SCNNode], completion: (() -> ())?) {
     let moveLeftArm = SCNAction.sequence([
-      SCNAction.moveBy(x: 1, y: 0, z: 0, duration: 1),
+      SCNAction.moveBy(x: 0.5, y: 0, z: 0, duration: 1),
       SCNAction.moveBy(x: 5, y: 0, z: 0, duration: 0.5)
       ])
     
     let moveRightArm = SCNAction.sequence([
-      SCNAction.moveBy(x: -1, y: 0, z: 0, duration: 1),
+      SCNAction.moveBy(x: -0.5, y: 0, z: 0, duration: 1),
       SCNAction.moveBy(x: -5, y: 0, z: 0, duration: 0.5)
       ])
     
@@ -144,8 +145,8 @@ public extension RobotsManager {
     let changeArm = SCNAction.run { (_) in
       oldArms[0].removeFromParentNode()
       oldArms[1].removeFromParentNode()
-      newArms[0].position.x = newArms[0].position.x + 6
-      newArms[1].position.x = newArms[1].position.x - 6
+      newArms[0].position.x = newArms[0].position.x + 5.5
+      newArms[1].position.x = newArms[1].position.x - 5.5
       self.rootRobotNode.addChildNode(newArms[0])
       self.rootRobotNode.addChildNode(newArms[1])
       self.rootRobotNode.runAction(SCNAction.sequence([moveNewArms, SCNAction.run({ _ in
