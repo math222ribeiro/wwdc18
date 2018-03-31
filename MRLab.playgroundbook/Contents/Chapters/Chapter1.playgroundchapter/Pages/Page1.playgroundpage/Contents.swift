@@ -18,11 +18,11 @@ public struct Robot {
   }
   
   public mutating func setLeftArm(fromRobot robot: RobotName, ofColor color: RobotColor) {
-    robotDictionary[RobotNode.Part.arm.rawValue + "Left"] = PlaygroundValue.string("\(robot);\(color)")
+    robotDictionary[RobotNode.Part.arm.rawValue + "\(RobotNode.Arm.left.rawValue)"] = PlaygroundValue.string("\(robot);\(color)")
   }
   
   public mutating func setRightArm(fromRobot robot: RobotName, ofColor color: RobotColor) {
-    robotDictionary[RobotNode.Part.arm.rawValue + "Right"] = PlaygroundValue.string("\(robot);\(color)")
+    robotDictionary[RobotNode.Part.arm.rawValue + "\(RobotNode.Arm.right.rawValue)"] = PlaygroundValue.string("\(robot);\(color)")
   }
   
   public mutating func setBody(fromRobot robot: RobotName, ofColor color: RobotColor) {
@@ -41,10 +41,30 @@ func createRobot() {
 }
 //#-end-hidden-code
 
+// Creating a robot Object
 var robot = Robot()
-robot.setHead(fromRobot: .boxBot, ofColor: .blue)
-robot.setBody(fromRobot: .boxBot, ofColor: .blue)
-robot.setLeftArm(fromRobot: .boxBot, ofColor: .blue)
-robot.setRightArm(fromRobot: .boxBot, ofColor: .blue)
-robot.setLeg(fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/, ofColor: .blue)
+
+// This was the code used to create the blue Box Bot you see on the screen. Try changing these values to create your own robot.
+robot.setHead(
+  fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/,
+  ofColor: /*#-editable-code*/.blue/*#-end-editable-code*/
+)
+robot.setBody(
+  fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/,
+  ofColor: /*#-editable-code*/.blue/*#-end-editable-code*/
+)
+robot.setLeftArm(
+  fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/,
+  ofColor: /*#-editable-code*/.blue/*#-end-editable-code*/
+)
+robot.setRightArm(
+  fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/,
+  ofColor: /*#-editable-code*/.blue/*#-end-editable-code*/
+)
+robot.setLeg(
+  fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/,
+  ofColor: /*#-editable-code*/.blue/*#-end-editable-code*/
+)
+
+// Creating your brand new robot
 createRobot()
