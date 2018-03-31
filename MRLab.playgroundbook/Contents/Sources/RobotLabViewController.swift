@@ -18,8 +18,6 @@ public class RobotLabViewController: UIViewController {
   /// The node which holds all robot parts.
   var rootRobotNode: SCNNode!
   
-  var miniBot: MiniBot! // TODO: Fix Animations
-  
   /// Robot current rotation on Y-axis.
   var robotRotationY: Float!
   
@@ -46,7 +44,6 @@ public class RobotLabViewController: UIViewController {
   var robotsButton: UIButton!
   var lowOpacityView: UIView!
   var robotCardImageView: UIImageView!
-  var robotsImages = [UIImage]()
   var robotsCardImages = [UIImage]()
   
   /// Index of the robot card that is being displayed.
@@ -60,9 +57,6 @@ public class RobotLabViewController: UIViewController {
   
   /// Current scene point of view.
   var currentCamera: SCNNode!
-  
-  /// Timer that plays the idleVariation animation
-  var miniBotTimerAnimation: Timer! // TODO: Fix Animations
   
   // MARK: Players
   
@@ -95,7 +89,6 @@ public class RobotLabViewController: UIViewController {
   
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(true)
-    //    loadMiniBot()
     initialRobotRotationY = rootRobotNode.eulerAngles.y
   }
   
@@ -149,7 +142,6 @@ public class RobotLabViewController: UIViewController {
     isRobotRotationEnabled = false
     mainView.isHidden = true
     lowOpacityView.isHidden = true
-    //    miniBotTimerAnimation.invalidate()
     
     rootRobotNode.runAction(SCNAction.sequence([
       // Makes the robot face the camera.
@@ -162,20 +154,11 @@ public class RobotLabViewController: UIViewController {
         robotNode.setLeftArm(robotName: .boxBot, robotColor: .yellow)
         robotNode.setRightArm(robotName: .boxBot, robotColor: .yellow)
         RobotsManager.shared.setRobotNodeOnScene(robotNode) {
-          //          self.miniBot.playAnimation(.excited)
           self.isRobotRotationEnabled = true
           self.mainView.isHidden = false
           self.successSoundEffectPlayer.play()
         }
-      })
-      ]))
-  }
-  
-  func loadMiniBot() {
-        miniBot = MiniBot(rootNode: scene.rootNode.childNode(named: "mini-bot"), state: .normal)
-    //    miniBotTimerAnimation = Timer.scheduledTimer(withTimeInterval: 8, repeats: true) { (_) in
-    //      self.miniBot.playAnimation(.idleVariation)
-    //    }
+      })]))
   }
 }
 
@@ -250,9 +233,6 @@ extension RobotLabViewController {
   
   func getRobotsImages() {
     for robot in RobotNode.Name.all {
-      //      robotsImages.append(UIImage(
-      //        named: robot.rawValue.firstLetterCapitalized() +  "_icon")!
-      //      )
       robotsCardImages.append(UIImage(
         named: robot.rawValue.firstLetterCapitalized() + "_card_icon")!
       )
@@ -282,8 +262,7 @@ extension RobotLabViewController {
     if currentRobotIndex == RobotNode.Name.all.count {
       currentRobotIndex = 0
     }
-    
-    //    robotsButton.setImage(robotsImages[currentRobotIndex], for: .normal)
+
     animateCardImageView(robotCardImageView)
     robotCardImageView.image = robotsCardImages[currentRobotIndex]
   }
@@ -402,10 +381,6 @@ extension RobotLabViewController: CameraAnimationDelegate {
   }
   
   func playWelcomeAnimation() {
-    let waveAction = SCNAction.run { (_) in
-      //      self.miniBot.playAnimation(.waving)
-    }
-    
     let cameraAnimationAction = SCNAction.sequence(
       [SCNAction.wait(duration: 2),
        SCNAction.run({ (_) in
@@ -415,7 +390,7 @@ extension RobotLabViewController: CameraAnimationDelegate {
     )
     
     // Initial camera animaiton
-    scene.rootNode.runAction(SCNAction.group([cameraAnimationAction]))
+    scene.rootNode.runAction(cameraAnimationAction)
     Timer.scheduledTimer(withTimeInterval: 3.1, repeats: false) { (_) in
       self.mainView.isHidden = false
     }

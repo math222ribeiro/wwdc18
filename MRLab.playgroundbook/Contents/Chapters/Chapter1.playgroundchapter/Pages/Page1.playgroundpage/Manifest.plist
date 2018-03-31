@@ -7,6 +7,6 @@
 	<key>Name</key>
 	<string>Example Page</string>
 	<key>LiveViewMode</key>
-	<string>HiddenByDefault</string>
+	<string>VisibleByDefault</string>
 </dict>
 </plist>
