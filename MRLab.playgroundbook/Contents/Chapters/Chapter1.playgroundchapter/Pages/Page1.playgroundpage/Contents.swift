@@ -3,6 +3,9 @@ import PlaygroundSupport
 
 let page = PlaygroundPage.current
 
+/*
+  User Interface to interact with the playground.
+ */
 public typealias RobotName = RobotNode.Name
 public typealias RobotColor = RobotNode.Color
 
@@ -35,6 +38,7 @@ public struct Robot {
 }
 
 func createRobot() {
+  if !RobotsManager.shared.canCreateRobot { return }
   if let proxy = page.liveView as? PlaygroundRemoteLiveViewProxy {
     proxy.send(.dictionary(robot.robotDictionary))
   }

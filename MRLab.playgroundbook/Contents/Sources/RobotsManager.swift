@@ -21,6 +21,8 @@ public class RobotsManager {
   /// Delegate for animating the camera on robot change.
   public var cameraDelegate: CameraAnimationDelegate!
   
+  public var canCreateRobot = true
+  
   /// Sets the rootRobotNode and cameraDelegate,
   /// gets the current robot from the root node and sets it on currentRobot.
   public func configure(rootRobotNode: SCNNode, cameraDelegate: CameraAnimationDelegate) {
@@ -68,6 +70,8 @@ public class RobotsManager {
 //////////////////////////////////
 public extension RobotsManager {
   public func setRobotNodeOnScene(_ robotNode: RobotNode, completion: (() -> ())?) {
+    if !canCreateRobot { return } else { canCreateRobot = false }
+  
     // Copy the transform and name.
     customNodeCopy(robotNode.legNode, currentRobot.legNode)
     customNodeCopy(robotNode.bodyNode, currentRobot.bodyNode)
@@ -82,6 +86,8 @@ public extension RobotsManager {
           self.changeLegs(self.currentRobot.legNode, to: robotNode.legNode, completion: {
             // If nil is passed the camera is animated to the full robot position
             self.cameraDelegate.animateCameraToRobotPart(nil, completion: completion)
+            self.currentRobot = robotNode
+            self.canCreateRobot = true
           })
         }
       }
@@ -105,7 +111,7 @@ public extension RobotsManager {
   }
   
   public func changeBody(_ oldBody: SCNNode, to newBody: SCNNode, completion: (() -> ())?) {
-    let scaleOldBody = SCNAction.scale(to: 0.1, duration: 1)
+    let scaleOldBody = SCNAction.scale(to: 0, duration: 1)
     let fadeInNewBody = SCNAction.fadeIn(duration: 0.2)
     let changeBody = SCNAction.run { (_) in
       newBody.opacity = 0
