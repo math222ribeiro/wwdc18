@@ -4,11 +4,13 @@ import SceneKit
 extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
   public func receive(_ message: PlaygroundValue) {
     let legPart: (name: RobotNode.Name, color: RobotNode.Color)
+    let dict: [String: PlaygroundValue]
     switch message {
     case let .dictionary(dictionary):
       guard case let .string(leg)? = dictionary[RobotNode.Part.leg.rawValue] else {
         return
       }
+      dict = dictionary
       let config = leg.components(separatedBy: ";")
       
       switch config[0] {
@@ -51,5 +53,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
           self.successSoundEffectPlayer.play()
         }
       })]))
+    
+    PlaygroundKeyValueStore.current["robot"] = .dictionary(dict)
   }
 }
