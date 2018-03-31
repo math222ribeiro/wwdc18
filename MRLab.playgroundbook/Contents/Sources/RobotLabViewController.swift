@@ -113,7 +113,7 @@ public class RobotLabViewController: UIViewController {
   
   public func setupScene() {
     sceneView.scene = scene
-    sceneView.showsStatistics = true
+//    sceneView.showsStatistics = true
     mainCamera = scene.rootNode.childNode(named: "camera_i_position")
     secondaryCamera = scene.rootNode.childNode(named: "camera_b")
     ortogonalCamera = scene.rootNode.childNode(named: "camera_o")
@@ -227,22 +227,24 @@ extension RobotLabViewController {
   /// used for updating the UI when the user change the scene size.
   func updateFrames() {
     rightButtonFrame = CGRect(
-      x: view.bounds.maxX - 30 - 120,
-      y: view.bounds.maxY - 30 - 90,
-      width: 120,
-      height: 90
+      x: view.bounds.maxX - 30 - 100,
+      y: view.bounds.maxY - 67 - 80,
+      width: 90,
+      height: 67
     )
+    
     leftButtonFrame = CGRect(
       x: 30,
-      y: view.bounds.maxY - 30 - 90,
-      width: 120,
-      height: 90
+      y: view.bounds.maxY - 67 - 90,
+      width: 90,
+      height: 67
     )
+    
     centerCardFrame = CGRect(
-      x: view.bounds.maxX / 2 - 150,
-      y: view.bounds.maxY / 2 - 240,
-      width: 300,
-      height: 479
+      x: view.bounds.maxX / 2 - 137,
+      y: view.bounds.maxY / 2 - 218,
+      width: 274,
+      height: 437
     )
   }
   

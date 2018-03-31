@@ -23,18 +23,3 @@ public extension String  {
     return self.prefix(1).uppercased() + self.dropFirst()
   }
 }
-
-//extension SCNAnimationPlayer {
-//  public class func loadAnimation(fromScene scene: SCNScene) -> SCNAnimationPlayer {
-//    var animationPlayer: SCNAnimationPlayer! = nil
-//
-//    scene.rootNode.enumerateChildNodes { (child, stop) in
-//      if !child.animationKeys.isEmpty {
-//        animationPlayer = child.animationPlayer(forKey: child.animationKeys[0])
-//        stop.pointee = true
-//      }
-//    }
-//
-//    return animationPlayer
-//  }
-//}
