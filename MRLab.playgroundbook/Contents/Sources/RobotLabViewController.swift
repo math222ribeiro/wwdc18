@@ -19,7 +19,7 @@ public class RobotLabViewController: UIViewController {
   var rootRobotNode: SCNNode!
   
   /// Robot current rotation on Y-axis.
-  var robotRotationY: Float!
+  var robotRotationY: Float = 0
   
   var initialRobotRotationY: Float!
   
@@ -60,6 +60,9 @@ public class RobotLabViewController: UIViewController {
   /// Current scene point of view.
   var currentCamera: SCNNode!
   
+  /// Timer that plays the idleVariation animation
+  var miniBotTimerAnimation: Timer!
+  
   // MARK: Players
   
   var backgrounMusicPlayer: AVAudioPlayer!
@@ -87,7 +90,7 @@ public class RobotLabViewController: UIViewController {
     }
     setupAudio()
     playWelcomeAnimation()
-    miniBot = MiniBot(rootNode: scene.rootNode.childNode(named: "mini-bot"), state: .normal)
+    loadMiniBot()
   }
   
   public override func viewDidAppear(_ animated: Bool) {
@@ -145,6 +148,7 @@ public class RobotLabViewController: UIViewController {
     isRobotRotationEnabled = false
     mainView.isHidden = true
     lowOpacityView.isHidden = true
+    miniBotTimerAnimation.invalidate()
     
     rootRobotNode.runAction(SCNAction.sequence([
       // Makes the robot face the camera.
@@ -157,11 +161,19 @@ public class RobotLabViewController: UIViewController {
         robotNode.setLeftArm(robotName: .boxBot, robotColor: .yellow)
         robotNode.setRightArm(robotName: .boxBot, robotColor: .yellow)
         RobotsManager.shared.setRobotNodeOnScene(robotNode) {
+          self.miniBot.playAnimation(.happy)
           self.isRobotRotationEnabled = true
           self.mainView.isHidden = false
           self.successSoundEffectPlayer.play()
         }
       })]))
+  }
+  
+  func loadMiniBot() {
+    miniBot = MiniBot(rootNode: scene.rootNode.childNode(named: "mini-bot"), state: .normal)
+    miniBotTimerAnimation = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { (_) in
+      self.miniBot.playAnimation(.idleVariation)
+    }
   }
 }
 
@@ -384,6 +396,10 @@ extension RobotLabViewController: CameraAnimationDelegate {
   }
   
   func playWelcomeAnimation() {
+    let waveAction = SCNAction.run { (_) in
+      self.miniBot.playAnimation(.waving)
+    }
+    
     let cameraAnimationAction = SCNAction.sequence(
       [SCNAction.wait(duration: 2),
        SCNAction.run({ (_) in
@@ -393,7 +409,7 @@ extension RobotLabViewController: CameraAnimationDelegate {
     )
     
     // Initial camera animaiton
-    scene.rootNode.runAction(cameraAnimationAction)
+    scene.rootNode.runAction(SCNAction.group([waveAction, cameraAnimationAction]))
     Timer.scheduledTimer(withTimeInterval: 3.1, repeats: false) { (_) in
       self.mainView.isHidden = false
     }

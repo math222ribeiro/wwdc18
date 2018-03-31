@@ -6,7 +6,7 @@
 
 import SceneKit
 
-public struct MiniBot {
+public struct MiniBot: AnimationPlayer {
   private var rootNode: SCNNode
   
   public enum Animation {
@@ -15,6 +15,7 @@ public struct MiniBot {
     case waving
     case danceVariation
     case clapping
+    case happy
   }
   
   public enum InitialState {
@@ -28,26 +29,12 @@ public struct MiniBot {
     var sceneName: String
     switch state {
     case .dance:
-      sceneName = "MiniBot/dance"
+      sceneName = "dance.scn"
     case .normal:
-      sceneName = "MiniBot/idle"
+      sceneName = "idle.scn"
     }
     
-//    guard let url = Bundle.main.url(forResource: "robots.scnassets/MiniBot/idle", withExtension: "scn") else {
-//      return
-//    }
-//    var idleScene = SCNScene()
-//
-//    do {
-//      let scene: SCNScene
-//      scene = try SCNScene(url: url, options: [:])
-//      idleScene = scene
-//    }
-//    catch {
-//      fatalError("sdhfdshf")
-//    }
-    
-    let idleScene = SCNScene(named: "idle.scn", inDirectory: "robots.scnassets/MiniBot/")!
+    let idleScene = SCNScene(named: sceneName, inDirectory: "robots.scnassets/MiniBot/")!
     for node in idleScene.rootNode.childNodes {
       rootNode.addChildNode(node)
     }
@@ -55,84 +42,79 @@ public struct MiniBot {
     // Fixes the node scale on the scene.
     rootNode.scale = SCNVector3(0.011, 0.011, 0.011)
     rootNode.addAnimation(CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/idle.scn"), forKey: "idle")
-//    animation(named: "idle.scn")
   }
-  
-//  func animation(named animationName: String) -> SCNAnimation? {
-//    let animScene = SCNScene(named: animationName, inDirectory: "robots.scnassets/MiniBot")
-//    var animation: SCNAnimation?
-//    animScene?.rootNode.enumerateChildNodes({ (child, stop) in
-//      if !child.animationKeys.isEmpty {
-//        let player = child.animationPlayer(forKey: child.animationKeys[0])
-//        animation = player?.animation
-//        stop.initialize(to: true)
-//      }
-//    })
-//
-//    return animation
-//  }
   
   // MARK: Animations
   
-//  public func playAnimation(_ animation: Animation) {
-//    switch animation {
-//    case .idleVariation:
-//      playIdleVariationAnimation()
-//    case .danceVariation:
-//      playDanceVariationAnimation()
-//    case .excited:
-//      playExcitedAnimation()
-//    case .waving:
-//      playWavingAnimation()
-//    case .clapping:
-//      playClappingAnimation()
-//    }
-//  }
-//
-//  private func playIdleVariationAnimation() {
-//    let idleVariation = SCNAnimationPlayer.loadAnimation(fromScene: Assets.getScene(named: "MiniBot/idle_var"))
-//    idleVariation.play()
-//    idleVariation.animation.repeatCount = 1
-//    idleVariation.animation.blendOutDuration = 0.5
-//    idleVariation.animation.blendInDuration = 0.3
-//    rootNode.addAnimationPlayer(idleVariation, forKey: "idle_var")
-//  }
-//
-//  private func playDanceVariationAnimation() {
-//    let danceVariation = SCNAnimationPlayer.loadAnimation(fromScene: Assets.getScene(named: "MiniBot/dance_var"))
-//    danceVariation.play()
-//    danceVariation.animation.repeatCount = 1
-//    danceVariation.animation.blendOutDuration = 0.5
-//    danceVariation.animation.blendInDuration = 0.3
-//    rootNode.addAnimationPlayer(danceVariation, forKey: "dance_var")
-//  }
-//
-//  private func playClappingAnimation() {
-//    let clapping = SCNAnimationPlayer.loadAnimation(fromScene: Assets.getScene(named: "MiniBot/clapping"))
-//    clapping.play()
-//    clapping.animation.repeatCount = 4
-//    clapping.animation.blendOutDuration = 0.5
-//    clapping.animation.blendInDuration = 0.3
-//    rootNode.addAnimationPlayer(clapping, forKey: "clapping")
-//  }
-//
-//  private func playExcitedAnimation() {
-//    let happy = SCNAnimationPlayer.loadAnimation(fromScene: Assets.getScene(named: "MiniBot/excited"))
-//    happy.play()
-//    happy.animation.repeatCount = CGFloat.infinity
-//    happy.animation.blendOutDuration = 0.8
-//    happy.animation.blendInDuration = 0.3
-//    rootNode.addAnimationPlayer(happy, forKey: "excited")
-//  }
-//
-//  private func playWavingAnimation() {
-//    let waving = SCNAnimationPlayer.loadAnimation(fromScene: Assets.getScene(named: "MiniBot/waving"))
-//    waving.play()
-//    waving.animation.repeatCount = 2
-//    waving.animation.blendOutDuration = 0.2
-//    waving.animation.blendInDuration = 0.8
-//    rootNode.addAnimationPlayer(waving, forKey: "happy")
-//  }
+  public func playAnimation(_ animation: Animation) {
+    switch animation {
+    case .idleVariation:
+      playIdleVariationAnimation()
+    case .danceVariation:
+      playDanceVariationAnimation()
+    case .excited:
+      playExcitedAnimation()
+    case .waving:
+      playWavingAnimation()
+    case .clapping:
+      playClappingAnimation()
+    case .happy:
+      playHappyAnimation()
+    }
+  }
+
+  private func playIdleVariationAnimation() {
+    let idleVariation = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/idle_var.scn")
+    idleVariation.repeatCount = 1
+    rootNode.addAnimation(idleVariation, forKey: "danceVariation")
+  }
+
+  private func playDanceVariationAnimation() {
+    let danceVariation = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/dance_var.scn")
+    danceVariation.repeatCount = 1
+    rootNode.addAnimation(danceVariation, forKey: "danceVariation")
+  }
+
+  private func playClappingAnimation() {
+    let clapping = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/clapping.scn")
+    clapping.repeatCount = 2
+    rootNode.addAnimation(clapping, forKey: "clapping")
+  }
+
+  private func playExcitedAnimation() {
+    let excited = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/excited.scn")
+    rootNode.addAnimation(excited, forKey: "excited")
+  }
+
+  private func playWavingAnimation() {
+    let waving = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/waving.scn")
+    waving.repeatCount = 2
+    rootNode.addAnimation(waving, forKey: "waving")
+  }
+  
+  /// "Clapping" animation and "Excited" animaiton together
+  private func playHappyAnimation() {
+    let clapping = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/clapping.scn")
+    clapping.repeatCount = 3
+    clapping.speed = 1.4
+    let delegate = MiniBotHappyAnimationDelegate()
+    delegate.animationPlayer = self
+    clapping.delegate = delegate
+    rootNode.addAnimation(clapping, forKey: "clapping")
+  }
+}
+
+class MiniBotHappyAnimationDelegate: NSObject, CAAnimationDelegate {
+  
+  var animationPlayer: AnimationPlayer!
+  
+  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+    animationPlayer.playAnimation(.excited)
+  }
+}
+
+protocol AnimationPlayer {
+  func playAnimation(_ animation: MiniBot.Animation)
 }
 
 extension CAAnimation {
@@ -152,13 +134,12 @@ extension CAAnimation {
       fatalError("Failed to find animation named \(name).")
     }
     
-    foundAnimation.fadeInDuration = 0.3
-    foundAnimation.fadeOutDuration = 0.3
-    foundAnimation.repeatCount = 1
+    foundAnimation.fadeInDuration = 0.5
+    foundAnimation.fadeOutDuration = 0.5
     foundAnimation.usesSceneTimeBase = false
     foundAnimation.repeatCount = Float.infinity
+    foundAnimation.isRemovedOnCompletion = true
     
     return foundAnimation
   }
 }
-
