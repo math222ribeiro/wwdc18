@@ -2,10 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Version</key>
-	<string>1.0</string>
 	<key>Name</key>
-	<string>Sample Chapter</string>
+	<string>Robots Rock</string>
 	<key>Pages</key>
 	<array>
 		<string>Page1.playgroundpage</string>

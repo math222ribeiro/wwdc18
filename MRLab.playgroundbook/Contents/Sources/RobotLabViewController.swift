@@ -85,9 +85,9 @@ public class RobotLabViewController: UIViewController {
     setupScene()
     setupViews()
     setRootRobotNode()
-    Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { (_) in
-      self.createRobot()
-    }
+//    Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { (_) in
+//      self.createRobot()
+//    }
     setupAudio()
     playWelcomeAnimation()
     loadMiniBot()
