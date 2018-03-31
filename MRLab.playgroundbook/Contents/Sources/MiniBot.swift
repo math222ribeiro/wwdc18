@@ -33,16 +33,28 @@ public struct MiniBot {
       sceneName = "MiniBot/idle"
     }
     
-//    let idleScene = SCNScene(named: "idlee.scn", inDirectory: "robots.scnassets/MiniBot")!
-//    for node in idleScene.rootNode.childNodes {
-//      rootNode.addChildNode(node)
+//    guard let url = Bundle.main.url(forResource: "robots.scnassets/MiniBot/idle", withExtension: "scn") else {
+//      return
 //    }
-//    for node in rootNode.childNodes {
-//      node.runAction(SCNAction.fadeOut(duration: 0))
+//    var idleScene = SCNScene()
+//
+//    do {
+//      let scene: SCNScene
+//      scene = try SCNScene(url: url, options: [:])
+//      idleScene = scene
 //    }
+//    catch {
+//      fatalError("sdhfdshf")
+//    }
+    
+    let idleScene = SCNScene(named: "idle.scn", inDirectory: "robots.scnassets/MiniBot/")!
+    for node in idleScene.rootNode.childNodes {
+      rootNode.addChildNode(node)
+    }
+
     // Fixes the node scale on the scene.
     rootNode.scale = SCNVector3(0.011, 0.011, 0.011)
-//    rootNode.addAnimation(CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/idlee.scn"), forKey: "")
+    rootNode.addAnimation(CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/idle.scn"), forKey: "idle")
 //    animation(named: "idle.scn")
   }
   

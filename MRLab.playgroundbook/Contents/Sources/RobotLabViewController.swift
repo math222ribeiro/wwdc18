@@ -28,6 +28,8 @@ public class RobotLabViewController: UIViewController {
   
   var isRobotRotationEnabled = true
   
+  var miniBot: MiniBot!
+  
   /// A flag to indicate if the user is on robot list view.
   var isOnRobotListView = false
   
@@ -85,6 +87,7 @@ public class RobotLabViewController: UIViewController {
     }
     setupAudio()
     playWelcomeAnimation()
+    miniBot = MiniBot(rootNode: scene.rootNode.childNode(named: "mini-bot"), state: .normal)
   }
   
   public override func viewDidAppear(_ animated: Bool) {
