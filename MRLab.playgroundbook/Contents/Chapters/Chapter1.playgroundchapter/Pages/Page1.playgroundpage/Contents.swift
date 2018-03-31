@@ -1,3 +1,4 @@
+//#-hidden-code
 import PlaygroundSupport
 
 let page = PlaygroundPage.current
@@ -38,11 +39,12 @@ func createRobot() {
     proxy.send(.dictionary(robot.robotDictionary))
   }
 }
+//#-end-hidden-code
 
 var robot = Robot()
 robot.setHead(fromRobot: .boxBot, ofColor: .blue)
 robot.setBody(fromRobot: .boxBot, ofColor: .blue)
 robot.setLeftArm(fromRobot: .boxBot, ofColor: .blue)
 robot.setRightArm(fromRobot: .boxBot, ofColor: .blue)
-robot.setLeg(fromRobot: .boxBot, ofColor: .blue)
+robot.setLeg(fromRobot: /*#-editable-code*/.boxBot/*#-end-editable-code*/, ofColor: .blue)
 createRobot()
