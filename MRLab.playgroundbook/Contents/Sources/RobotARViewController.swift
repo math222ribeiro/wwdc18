@@ -20,6 +20,10 @@ public class RobotARViewController: UIViewController {
   var alphaPlaneOnScene = false
   var canPlaneNodeShow = true
   var miniBot: MiniBot!
+  /// Timer that plays the danceVariation animation
+  var miniBotTimerAnimation: Timer!
+  
+  var miniBotMusicPlayer: AVAudioPlayer!
   var tablesNodes = [SCNNode]()
   var a = 0
   
@@ -43,6 +47,7 @@ public class RobotARViewController: UIViewController {
     setRootRobotNode()
     loadMiniBot()
     loadTablesNodes()
+    setupAudio()
   }
   
   public override func viewWillLayoutSubviews() {
@@ -70,7 +75,33 @@ public class RobotARViewController: UIViewController {
   public override func viewWillDisappear(_ animated: Bool) {
     sceneView.session.pause()
   }
+  
+  func setupAudio() {
+    do {
+      var path = Bundle.main.path(forResource: "beat", ofType: "mp3")
+      miniBotMusicPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path!))
+      miniBotMusicPlayer.numberOfLoops = -1
+      miniBotMusicPlayer.volume = 0.3
+      
+      // Stop the background music when swift playground app is on background
+      NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+      // Play the background music when swift playground app is on background
+      NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+    } catch {
+      fatalError("Failed to load the sounds.")
+    }
+  }
 
+  @objc
+  public func appWillResignActive() {
+    miniBotMusicPlayer.stop()
+  }
+  
+  @objc
+  public func appDidBecomeActive() {
+//    miniBotMusicPlayer.play()
+  }
+  
   func updateFrames() {
     feedbackViewFrame = CGRect(x: 25, y: 75, width: 400, height: 30)
   }
@@ -115,6 +146,9 @@ public class RobotARViewController: UIViewController {
     let node = SCNNode()
     miniBot = MiniBot(rootNode: node, state: .dance)
     node.scale = SCNVector3(0.008, 0.008, 0.008)
+    miniBotTimerAnimation = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { (_) in
+      self.miniBot.playAnimation(.danceVariation)
+    }
   }
   
   func loadTablesNodes() {
@@ -166,6 +200,7 @@ public class RobotARViewController: UIViewController {
     } else {
       a += 1
       miniBot.rootNode.position = position
+      miniBotMusicPlayer.play()
       return miniBot.rootNode
     }
   }

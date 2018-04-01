@@ -37,8 +37,6 @@ extension RobotARViewController: ARSCNViewDelegate {
       let plane = alphaPlane.geometry as? SCNPlane
       else { return }
     
-    setFeedbackText(forCameraTrackingState: .normal)
-    
     plane.width = CGFloat(planeAnchor.extent.x)
     plane.height = CGFloat(planeAnchor.extent.z)
     alphaPlane.position = SCNVector3(planeAnchor.center.x, planeAnchor.center.y, planeAnchor.center.z)
