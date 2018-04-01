@@ -11,15 +11,36 @@ import PlaygroundSupport
 
 public class RobotARViewController: UIViewController {
   
+  enum ObjectAR: Int {
+    case robot = 0
+    case miniBot
+    case table
+    case table2
+    case table3
+  }
+  
   var sceneView: ARSCNView!
   var planeNodes = [SCNNode]()
   
+  var feedbackViewFrame: CGRect!
+  var resetButtonFrame: CGRect!
+  var leftButtonFrame: CGRect!
+  var rightButtonFrame: CGRect!
+  var topButtonFrame: CGRect!
+  
+  var resetButton: UIButton!
+  var robotButton: UIButton!
+  var miniBotButton: UIButton!
+  var tablesButtons: [UIButton]!
+  
   var feedbackView: UIView!
   var feedbackLabel: UILabel!
-  var feedbackViewFrame: CGRect!
+  
   var alphaPlaneOnScene = false
   var canPlaneNodeShow = true
   var miniBot: MiniBot!
+  
+  var currentObjectARNode: SCNNode!
   /// Timer that plays the danceVariation animation
   var miniBotTimerAnimation: Timer!
   
@@ -55,6 +76,8 @@ public class RobotARViewController: UIViewController {
     
     sceneView.frame = view.frame
     feedbackView.frame = feedbackViewFrame
+    resetButton.frame = resetButtonFrame
+    robotButton.frame = topButtonFrame
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -78,7 +101,7 @@ public class RobotARViewController: UIViewController {
   
   func setupAudio() {
     do {
-      var path = Bundle.main.path(forResource: "beat", ofType: "mp3")
+      let path = Bundle.main.path(forResource: "beat", ofType: "mp3")
       miniBotMusicPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path!))
       miniBotMusicPlayer.numberOfLoops = -1
       miniBotMusicPlayer.volume = 0.3
@@ -104,6 +127,53 @@ public class RobotARViewController: UIViewController {
   
   func updateFrames() {
     feedbackViewFrame = CGRect(x: 25, y: 75, width: 400, height: 30)
+    
+    resetButtonFrame = CGRect(
+      x: 25,
+      y: 115,
+      width: 70,
+      height: 52
+    )
+    
+    topButtonFrame = CGRect(
+      x: view.bounds.maxX - 25 - 70,
+      y: 125,
+      width: 70,
+      height: 52
+    )
+    
+    rightButtonFrame = CGRect(
+      x: view.bounds.maxX - 25 - 70,
+      y: view.bounds.maxY - 67 - 125,
+      width: 70,
+      height: 52
+    )
+    
+    leftButtonFrame = CGRect(
+      x: 25,
+      y: view.bounds.maxY - 67 - 125,
+      width: 90,
+      height: 52
+    )
+  }
+  
+  public func animateButton(_ button: UIButton, completion: @escaping () -> ()) {
+    UIView.animateKeyframes(
+      withDuration: 0.2,
+      delay: 0,
+      options: .calculationModeLinear,
+      animations: {
+        UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.5, animations: {
+          button.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+        })
+        
+        UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.5, animations: {
+          button.transform = CGAffineTransform.identity
+        })
+    },
+      completion: { _ in
+        completion()
+    })
   }
   
   func setupViews() {
@@ -119,8 +189,59 @@ public class RobotARViewController: UIViewController {
     feedbackLabel.text = "STARTING MAGIC..."
     feedbackView.addSubview(feedbackLabel)
     
+    resetButton = UIButton(frame: resetButtonFrame)
+    resetButton.setImage(UIImage(named: "reset_icon"), for: .normal)
+    resetButton.addTarget(self, action: #selector(didTapResetButton), for: .touchUpInside)
+    view.addSubview(resetButton)
+    
+    robotButton = UIButton(frame: topButtonFrame)
+    robotButton.setImage(UIImage(named: "bot_ar_icon"), for: .normal)
+    robotButton.addTarget(self, action: #selector(didTapSelectCurrentObjectAR), for: .touchUpInside)
+    robotButton.tag = 0
+    robotButton.alpha = 0.8
+    view.addSubview(robotButton)
+    
+    miniBotButton = UIButton(frame: leftButtonFrame)
+    view.addSubview(miniBotButton)
+    
+//    tablesButtons[0] = UIButton(frame: tablesNodes)
+    
     let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
     view.addGestureRecognizer(tap)
+  }
+  
+  @objc
+  public func didTapSelectCurrentObjectAR(sender: UIButton) {
+    animateButton(sender) {
+      self.selectCurrentObjectAR(sender.tag)
+    }
+  }
+  
+  func selectCurrentObjectAR(_ object: Int) {
+    switch object {
+    case ObjectAR.robot.rawValue:
+      robotButton.setImage(UIImage(named: "bot_ar_icon_selected"), for: .normal)
+      robotButton.alpha = 1
+      currentObjectARNode = RobotsManager.shared.rootRobotNode!
+      currentObjectARNode.scale = SCNVector3(0.36, 0.36, 0.36)
+    case ObjectAR.miniBot.rawValue:
+      currentObjectARNode = miniBot.rootNode
+    case ObjectAR.table.rawValue:
+      currentObjectARNode = tablesNodes[0]
+    case ObjectAR.table2.rawValue:
+      currentObjectARNode = tablesNodes[1]
+    case ObjectAR.table3.rawValue:
+      currentObjectARNode = tablesNodes[2]
+    default:
+      currentObjectARNode = SCNNode()
+    }
+  }
+  
+  @objc
+  public func didTapResetButton(sender: UIButton) {
+    animateButton(sender) {
+      self.resetTracking()
+    }
   }
   
   func setupLights() {
@@ -175,34 +296,9 @@ public class RobotARViewController: UIViewController {
   }
   
   private func createRobot(_ position: SCNVector3) -> SCNNode? {
-    if a == 0 {
-      if let robotNode = RobotsManager.shared.getRobotNode(fromPlaygroundMessage: PlaygroundKeyValueStore.current["robot"]) {
-        RobotsManager.shared.setRobot(robotNode)
-      }
-      
-//      let node = RobotsManager.shared.rootRobotNode!
-//      // Position scene
-//      node.position = position
-//      node.scale = SCNVector3(0.36, 0.36, 0.36)
-//      node.eulerAngles.y = convertToRadians(angle: 0)
-//      a += 1
-//      return node
-      let node = tablesNodes[2]
-      // Position scene
+      let node = currentObjectARNode!
       node.position = position
-      node.scale = SCNVector3(0.36, 0.36, 0.36)
-      node.eulerAngles.y = convertToRadians(angle: 0)
-      a += 1
       return node
-    } else if a == 1{
-      a += 1
-      return nil
-    } else {
-      a += 1
-      miniBot.rootNode.position = position
-      miniBotMusicPlayer.play()
-      return miniBot.rootNode
-    }
   }
 
   func placeRobot(_ result: ARHitTestResult) {
@@ -217,6 +313,7 @@ public class RobotARViewController: UIViewController {
     canPlaneNodeShow = false
   }
   
+  @objc
   public func resetTracking() {
     for node in sceneView.scene.rootNode.childNodes {
       node.removeFromParentNode()
