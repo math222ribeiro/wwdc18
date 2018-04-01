@@ -20,7 +20,7 @@ public class RobotARViewController: UIViewController {
   var alphaPlaneOnScene = false
   var canPlaneNodeShow = true
   var miniBot: MiniBot!
- 
+  var tablesNodes = [SCNNode]()
   var a = 0
   
   // MARK: Life Cycle
@@ -42,6 +42,7 @@ public class RobotARViewController: UIViewController {
     setupLights()
     setRootRobotNode()
     loadMiniBot()
+    loadTablesNodes()
   }
   
   public override func viewWillLayoutSubviews() {
@@ -116,6 +117,12 @@ public class RobotARViewController: UIViewController {
     node.scale = SCNVector3(0.008, 0.008, 0.008)
   }
   
+  func loadTablesNodes() {
+    for i in 1...3 {
+     tablesNodes.append(Assets.getScene(named: "RobotScene/Table_\(i).scn").rootNode.childNode(named: "Table_\(i)"))
+    }
+  }
+  
   @objc
   func handleTap(_ sender: UITapGestureRecognizer) {
     let tapLocation = sender.location(in: sceneView)
@@ -126,7 +133,6 @@ public class RobotARViewController: UIViewController {
       placeRobot(result)
     }
   }
-  
   
   func isPlaneNodesHidden(_ hidden: Bool) {
     for node in planeNodes {
@@ -140,14 +146,25 @@ public class RobotARViewController: UIViewController {
         RobotsManager.shared.setRobot(robotNode)
       }
       
-      let node = RobotsManager.shared.rootRobotNode!
+//      let node = RobotsManager.shared.rootRobotNode!
+//      // Position scene
+//      node.position = position
+//      node.scale = SCNVector3(0.36, 0.36, 0.36)
+//      node.eulerAngles.y = convertToRadians(angle: 0)
+//      a += 1
+//      return node
+      let node = tablesNodes[2]
       // Position scene
       node.position = position
       node.scale = SCNVector3(0.36, 0.36, 0.36)
       node.eulerAngles.y = convertToRadians(angle: 0)
       a += 1
       return node
+    } else if a == 1{
+      a += 1
+      return nil
     } else {
+      a += 1
       miniBot.rootNode.position = position
       return miniBot.rootNode
     }
@@ -156,13 +173,23 @@ public class RobotARViewController: UIViewController {
   func placeRobot(_ result: ARHitTestResult) {
     let transform = result.worldTransform
     let planePosition = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
-    let robotNode = createRobot(planePosition)!
+    guard let robotNode = createRobot(planePosition) else {
+      resetTracking()
+      return
+    }
     sceneView.scene.rootNode.addChildNode(robotNode)
     isPlaneNodesHidden(true)
     canPlaneNodeShow = false
   }
   
   public func resetTracking() {
+    for node in sceneView.scene.rootNode.childNodes {
+      node.removeFromParentNode()
+    }
+    
+    canPlaneNodeShow = true
+    planeNodes = [SCNNode]()
+    
     let configuration = ARWorldTrackingConfiguration()
     configuration.planeDetection = .horizontal
     sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
