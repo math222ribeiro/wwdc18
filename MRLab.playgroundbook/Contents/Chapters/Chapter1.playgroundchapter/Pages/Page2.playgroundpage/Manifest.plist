@@ -8,6 +8,8 @@
 	<string>Normal</string>
 	<key>LiveViewEdgeToEdge</key>
 	<true/>
+	<key>PosterReference</key>
+	<string>poster2.png</string>
 	<key>LiveViewMode</key>
 	<string>VisibleByDefault</string>
 </dict>

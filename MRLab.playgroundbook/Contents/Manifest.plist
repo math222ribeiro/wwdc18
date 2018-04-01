@@ -7,7 +7,7 @@
 	<key>ContentVersion</key>
 	<string>1.0</string>
 	<key>Name</key>
-	<string>MR Lab</string>
+	<string>MRLab</string>
 	<key>ContentIdentifier</key>
 	<string>com.wwdc.matheus.mrlab</string>
 	<key>DeploymentTarget</key>
@@ -20,5 +20,9 @@
 	<array>
 		<string>Chapter1.playgroundchapter</string>
 	</array>
+	<key>Subtitle</key>
+	<string>Robot AR Playground</string>
+	<key>ImageReference</key>
+	<string>cover.png</string>
 </dict>
 </plist>
