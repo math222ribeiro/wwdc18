@@ -5,6 +5,7 @@
 //
 
 import SceneKit
+import PlaygroundSupport
 
 // Singleton that handles the robot change on the scene.
 public class RobotsManager {
@@ -25,7 +26,7 @@ public class RobotsManager {
   
   /// Sets the rootRobotNode and cameraDelegate,
   /// gets the current robot from the root node and sets it on currentRobot.
-  public func configure(rootRobotNode: SCNNode, cameraDelegate: CameraAnimationDelegate) {
+  public func configure(rootRobotNode: SCNNode, cameraDelegate: CameraAnimationDelegate?) {
     self.rootRobotNode = rootRobotNode
     let legNode = rootRobotNode.childNode(named: "leg")
     let leftArmNode = rootRobotNode.childNode(named: "arm_left")
@@ -33,7 +34,9 @@ public class RobotsManager {
     let bodyNode = rootRobotNode.childNode(named: "body")
     let headNode = rootRobotNode.childNode(named: "head")
     currentRobot = RobotNode(legNode: legNode, bodyNode: bodyNode, headNode: headNode, armsNodes: [leftArmNode, rightArmNode])
-    self.cameraDelegate = cameraDelegate
+    if let delegate = cameraDelegate {
+      self.cameraDelegate = delegate
+    }
   }
   
   // MARK: Helper Methods
@@ -184,5 +187,118 @@ public extension RobotsManager {
     cameraDelegate.animateCameraToRobotPart(.leg) {
       oldLegs.runAction(SCNAction.sequence([blinkOldLeg, changeLeg]))
     }
+  }
+  
+  /// Converts a robot part config from a string to the correct types
+  public func parseRobotConfig(_ config: String) -> (name: RobotNode.Name, color: RobotNode.Color)? {
+    let components = config.components(separatedBy: ";")
+    
+    if components.count != 2 {
+      fatalError("Robot weird size")
+    }
+    
+    let name: RobotNode.Name
+    let color: RobotNode.Color
+    
+    switch components[0] {
+    case RobotNode.Name.boxBot.rawValue:
+      name = .boxBot
+    case RobotNode.Name.celBot.rawValue:
+      name = .celBot
+    case RobotNode.Name.macBot.rawValue:
+      name = .macBot
+    case RobotNode.Name.liamBot.rawValue:
+      name = .liamBot
+    case RobotNode.Name.voltBot.rawValue:
+      name = .voltBot
+    default:
+      fatalError("Invalid string.")
+    }
+    
+    switch components[1] {
+    case RobotNode.Color.blue.rawValue:
+      color = .blue
+    case RobotNode.Color.yellow.rawValue:
+      color = .yellow
+    case RobotNode.Color.red.rawValue:
+      color = .red
+    default:
+      fatalError("Invalid string.")
+    }
+    
+    // Checks if the user has customized the robot.
+    if name == .boxBot && color == .blue {
+      return nil
+    }
+    
+    return (name, color)
+  }
+  
+  public func getRobotNode(fromPlaygroundMessage value: PlaygroundValue?) -> RobotNode? {
+    guard let message = value else { return nil }
+    let robotHead: (name: RobotNode.Name, color: RobotNode.Color)
+    let robotBody: (name: RobotNode.Name, color: RobotNode.Color)
+    let robotArmLeft: (name: RobotNode.Name, color: RobotNode.Color)
+    let robotArmRight: (name: RobotNode.Name, color: RobotNode.Color)
+    let robotLeg: (name: RobotNode.Name, color: RobotNode.Color)
+    
+    switch message {
+    case let .dictionary(dictionary):
+      guard case let .string(head)? = dictionary[RobotNode.Part.head.rawValue],
+        case let .string(body)? = dictionary[RobotNode.Part.body.rawValue],
+        case let .string(armLeft)? = dictionary[RobotNode.Part.arm.rawValue + "\(RobotNode.Arm.left.rawValue)"],
+        case let .string(armRight)? = dictionary[RobotNode.Part.arm.rawValue + "\(RobotNode.Arm.right.rawValue)"],
+        case let .string(leg)? = dictionary[RobotNode.Part.leg.rawValue]
+        else {
+          fatalError("Error on the dictionary.")
+      }
+      
+      guard let headConfig = parseRobotConfig(head), let bodyConfig = parseRobotConfig(body), let armLeftConfig = parseRobotConfig(armLeft),
+        let armRightConfig = parseRobotConfig(armRight), let legConfig = parseRobotConfig(leg) else {
+          return nil
+      }
+      
+      // Save the robot config for the next page.
+      PlaygroundKeyValueStore.current["robot"] = .dictionary(dictionary)
+      
+      robotHead = headConfig
+      robotBody = bodyConfig
+      robotArmLeft = armLeftConfig
+      robotArmRight = armRightConfig
+      robotLeg = legConfig
+      
+    default:
+      fatalError("No dictionary")
+    }
+    
+    var robotNode = RobotNode()
+    robotNode.setHead(robotName: robotHead.name, robotColor: robotHead.color)
+    robotNode.setLeg(robotName: robotLeg.name, robotColor: robotLeg.color)
+    robotNode.setBody(robotName: robotBody.name, robotColor: robotBody.color)
+    robotNode.setLeftArm(robotName: robotArmLeft.name, robotColor: robotArmLeft.color)
+    robotNode.setRightArm(robotName: robotArmRight.name, robotColor: robotArmRight.color)
+    return robotNode
+  }
+  
+  public func setRobot(_ robotNode: RobotNode) {
+    customNodeCopy(robotNode.legNode, currentRobot.legNode)
+    customNodeCopy(robotNode.bodyNode, currentRobot.bodyNode)
+    customNodeCopy(robotNode.headNode, currentRobot.headNode)
+    customNodeCopy(robotNode.armsNodes[0]!, currentRobot.armsNodes[0]!)
+    customNodeCopy(robotNode.armsNodes[1]!, currentRobot.armsNodes[1]!)
+    
+    currentRobot.headNode.removeFromParentNode()
+    currentRobot.bodyNode.removeFromParentNode()
+    currentRobot.legNode.removeFromParentNode()
+    currentRobot.armsNodes[0]!.removeFromParentNode()
+    currentRobot.armsNodes[1]!.removeFromParentNode()
+    
+    rootRobotNode.addChildNode(robotNode.headNode)
+    rootRobotNode.addChildNode(robotNode.bodyNode)
+    rootRobotNode.addChildNode(robotNode.legNode)
+    rootRobotNode.addChildNode(robotNode.armsNodes[0]!)
+    rootRobotNode.addChildNode(robotNode.armsNodes[1]!)
+    
+    currentRobot = robotNode
   }
 }

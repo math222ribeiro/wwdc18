@@ -7,6 +7,7 @@
 
 import UIKit
 import ARKit
+import PlaygroundSupport
 
 public class RobotARViewController: UIViewController {
   
@@ -36,6 +37,7 @@ public class RobotARViewController: UIViewController {
     
     setupViews()
     setupLights()
+    setRootRobotNode()
   }
   
   public override func viewWillLayoutSubviews() {
@@ -100,6 +102,10 @@ public class RobotARViewController: UIViewController {
     sceneView.scene.rootNode.addChildNode(omniLightNode)
   }
 
+  func setRootRobotNode() {
+    RobotsManager.shared.configure(rootRobotNode: Assets.getScene(named: Assets.mainSceneName).rootNode.childNode(named: "robot"), cameraDelegate: nil)
+  }
+  
   @objc
   func handleTap(_ sender: UITapGestureRecognizer) {
     let tapLocation = sender.location(in: sceneView)
@@ -118,9 +124,12 @@ public class RobotARViewController: UIViewController {
     }
   }
   
-  private func createRobotFromScene(_ position: SCNVector3) -> SCNNode? {
-    let scene = Assets.getScene(named: Assets.mainSceneName)
-    let node = scene.rootNode.childNode(named: "robot")
+  private func createRobot(_ position: SCNVector3) -> SCNNode? {
+    if let robotNode = RobotsManager.shared.getRobotNode(fromPlaygroundMessage: PlaygroundKeyValueStore.current["robot"]) {
+      RobotsManager.shared.setRobot(robotNode)
+    }
+    
+    let node = RobotsManager.shared.rootRobotNode!
     // Position scene
     node.position = position
     node.scale = SCNVector3(0.36, 0.36, 0.36)
@@ -131,7 +140,7 @@ public class RobotARViewController: UIViewController {
   func placeRobot(_ result: ARHitTestResult) {
     let transform = result.worldTransform
     let planePosition = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
-    let robotNode = createRobotFromScene(planePosition)!
+    let robotNode = createRobot(planePosition)!
     sceneView.scene.rootNode.addChildNode(robotNode)
     isPlaneNodesHidden(true)
     canPlaneNodeShow = false
