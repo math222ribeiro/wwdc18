@@ -18,6 +18,7 @@
     - When a grey plane appears on the screen you can tap on it to place your robot
     - After placing your robot you can chose another object to place on the scene by chosing one of the AR labeled buttons.
     - The bottom left button place tables of the lab. there are three available tables.
+    - If you select a button of an object that is already on the scene, when tapping on the scene you change its position.
  
  
  **Create by Matheus Ribeiro D'Azevedo Lopes for WWDC18**
