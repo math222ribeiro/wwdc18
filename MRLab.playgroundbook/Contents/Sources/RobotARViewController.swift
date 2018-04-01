@@ -19,6 +19,9 @@ public class RobotARViewController: UIViewController {
   var feedbackViewFrame: CGRect!
   var alphaPlaneOnScene = false
   var canPlaneNodeShow = true
+  var miniBot: MiniBot!
+ 
+  var a = 0
   
   // MARK: Life Cycle
   
@@ -38,6 +41,7 @@ public class RobotARViewController: UIViewController {
     setupViews()
     setupLights()
     setRootRobotNode()
+    loadMiniBot()
   }
   
   public override func viewWillLayoutSubviews() {
@@ -59,7 +63,7 @@ public class RobotARViewController: UIViewController {
   public override func viewDidAppear(_ animated: Bool) {
     guard ARWorldTrackingConfiguration.isSupported else { return }
     
-    AVCaptureDevice.requestAccess(for: .video) { (granted) in }
+    AVCaptureDevice.requestAccess(for: .video) { (_) in }
   }
   
   public override func viewWillDisappear(_ animated: Bool) {
@@ -106,6 +110,12 @@ public class RobotARViewController: UIViewController {
     RobotsManager.shared.configure(rootRobotNode: Assets.getScene(named: Assets.mainSceneName).rootNode.childNode(named: "robot"), cameraDelegate: nil)
   }
   
+  func loadMiniBot() {
+    let node = SCNNode()
+    miniBot = MiniBot(rootNode: node, state: .dance)
+    node.scale = SCNVector3(0.008, 0.008, 0.008)
+  }
+  
   @objc
   func handleTap(_ sender: UITapGestureRecognizer) {
     let tapLocation = sender.location(in: sceneView)
@@ -125,16 +135,22 @@ public class RobotARViewController: UIViewController {
   }
   
   private func createRobot(_ position: SCNVector3) -> SCNNode? {
-    if let robotNode = RobotsManager.shared.getRobotNode(fromPlaygroundMessage: PlaygroundKeyValueStore.current["robot"]) {
-      RobotsManager.shared.setRobot(robotNode)
+    if a == 0 {
+      if let robotNode = RobotsManager.shared.getRobotNode(fromPlaygroundMessage: PlaygroundKeyValueStore.current["robot"]) {
+        RobotsManager.shared.setRobot(robotNode)
+      }
+      
+      let node = RobotsManager.shared.rootRobotNode!
+      // Position scene
+      node.position = position
+      node.scale = SCNVector3(0.36, 0.36, 0.36)
+      node.eulerAngles.y = convertToRadians(angle: 0)
+      a += 1
+      return node
+    } else {
+      miniBot.rootNode.position = position
+      return miniBot.rootNode
     }
-    
-    let node = RobotsManager.shared.rootRobotNode!
-    // Position scene
-    node.position = position
-    node.scale = SCNVector3(0.36, 0.36, 0.36)
-    node.eulerAngles.y = convertToRadians(angle: 0)
-    return node
   }
 
   func placeRobot(_ result: ARHitTestResult) {

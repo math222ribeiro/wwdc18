@@ -7,7 +7,7 @@
 import SceneKit
 
 public struct MiniBot: AnimationPlayer {
-  private var rootNode: SCNNode
+  public var rootNode: SCNNode
   
   public enum Animation {
     case idleVariation
@@ -41,7 +41,7 @@ public struct MiniBot: AnimationPlayer {
 
     // Fixes the node scale on the scene.
     rootNode.scale = SCNVector3(0.011, 0.011, 0.011)
-    rootNode.addAnimation(CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/idle.scn"), forKey: "idle")
+    rootNode.addAnimation(CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/" + sceneName), forKey: "idle")
   }
   
   // MARK: Animations
