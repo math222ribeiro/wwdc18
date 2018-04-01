@@ -92,7 +92,7 @@ public struct MiniBot: AnimationPlayer {
     rootNode.addAnimation(waving, forKey: "waving")
   }
   
-  /// "Clapping" animation and "Excited" animaiton together
+  /// "Clapping" animation and "Excited" animaiton together.
   private func playHappyAnimation() {
     let clapping = CAAnimation.animation(withSceneName: "robots.scnassets/MiniBot/clapping.scn")
     clapping.repeatCount = 3
@@ -104,6 +104,7 @@ public struct MiniBot: AnimationPlayer {
   }
 }
 
+/// Delegate for happy animation.
 class MiniBotHappyAnimationDelegate: NSObject, CAAnimationDelegate {
   
   var animationPlayer: AnimationPlayer!
@@ -115,31 +116,4 @@ class MiniBotHappyAnimationDelegate: NSObject, CAAnimationDelegate {
 
 protocol AnimationPlayer {
   func playAnimation(_ animation: MiniBot.Animation)
-}
-
-extension CAAnimation {
-  public class func animation(withSceneName name: String) -> CAAnimation {
-    guard let scene = SCNScene(named: name) else {
-      fatalError("Failed to find scene with name \(name).")
-    }
-    
-    var animation: CAAnimation?
-    scene.rootNode.enumerateChildNodes { (child, stop) in
-      guard let firstKey = child.animationKeys.first else { return }
-      animation = child.animation(forKey: firstKey)
-      stop.initialize(to: true)
-    }
-    
-    guard let foundAnimation = animation else {
-      fatalError("Failed to find animation named \(name).")
-    }
-    
-    foundAnimation.fadeInDuration = 0.5
-    foundAnimation.fadeOutDuration = 0.5
-    foundAnimation.usesSceneTimeBase = false
-    foundAnimation.repeatCount = Float.infinity
-    foundAnimation.isRemovedOnCompletion = true
-    
-    return foundAnimation
-  }
 }

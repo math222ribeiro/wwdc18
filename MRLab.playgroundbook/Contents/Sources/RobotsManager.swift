@@ -44,6 +44,7 @@ public class RobotsManager {
     nodeA.name = nodeB.name!
   }
   
+  /// Gets the robot part from scene with especific color
   public func getRobotPartNode(_ robotPart: RobotNode.Part, robotName: RobotNode.Name,  robotColor: RobotNode.Color) -> SCNNode {
     let capitalizedName = robotName.rawValue.firstLetterCapitalized()
     let capitalizedPart = robotPart.rawValue.firstLetterCapitalized()
@@ -60,7 +61,6 @@ public class RobotsManager {
     
     return partNode
   }
-  
 }
 
 //////////////////////////////////

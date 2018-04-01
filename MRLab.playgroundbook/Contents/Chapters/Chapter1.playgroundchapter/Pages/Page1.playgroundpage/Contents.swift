@@ -1,14 +1,11 @@
 //#-hidden-code
 import PlaygroundSupport
 
-class Listener: PlaygroundRemoteLiveViewProxyDelegate {
+class LiveViewMessageListener: PlaygroundRemoteLiveViewProxyDelegate {
   var page: PlaygroundPage!
   
   func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy, received message: PlaygroundValue) {
-    guard case let .dictionary(dict) = message else {
-
-      return
-    }
+    guard case let .dictionary(dict) = message else { return }
     
     if case let .boolean(fail)? = dict["fail"] {
       if fail {
@@ -18,7 +15,6 @@ class Listener: PlaygroundRemoteLiveViewProxyDelegate {
         page.finishExecution()
       }
     }
-  
   }
   
   func remoteLiveViewProxyConnectionClosed(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy) {
@@ -43,22 +39,23 @@ Your robot needs to be completely different from blue Box Bot.
   robot.setLeg(fromRobot: .boxBot, ofColor: .yellow)`
 """
   case pass = """
-  ## Nice!
-  That is a good looking robot, Awesome!
+  ## Nice! That is a good looking robot!
+  Now you have your own robot, congratulations. It is time to give life to it.
   [Next Page](@next)
 """
 }
 
 let page = PlaygroundPage.current
 page.needsIndefiniteExecution = true
+
 let proxy = page.liveView as! PlaygroundRemoteLiveViewProxy
-let listener = Listener()
+let listener = LiveViewMessageListener()
 listener.page = page
 proxy.delegate = listener
 
 
 /*
-  User Interface to interact with the playground.
+  User interface to interact with the playground.
  */
 public typealias RobotName = RobotNode.Name
 public typealias RobotColor = RobotNode.Color
@@ -97,7 +94,7 @@ func createRobot() {
 }
 //#-end-hidden-code
 
-// Creating a robot Object
+// Creating a robot variable
 var robot = Robot()
 
 // This was the code used to create the blue Box Bot you see on the screen. Try changing these values to create your own robot.

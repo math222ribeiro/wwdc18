@@ -1,3 +1,9 @@
+//
+//  RobotLabViewController+PlaygroundLiveViewMessageHandler.swift
+//
+//  Copyright © 2018 Matheus Ribeiro D'Azevedo Lopes. All rights reserved.
+//
+
 import PlaygroundSupport
 import SceneKit
 
@@ -19,7 +25,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
             case let .string(armRight)? = dictionary[RobotNode.Part.arm.rawValue + "\(RobotNode.Arm.right.rawValue)"],
             case let .string(leg)? = dictionary[RobotNode.Part.leg.rawValue]
       else {
-        fatalError("Error on the dictionary")
+        fatalError("Error on the dictionary.")
       }
       
       // Save the dictionary value to store on PlaygroundKeyValueStore later.
@@ -40,7 +46,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
       robotLeg = legConfig
       
     default:
-      fatalError("NO DICTIONARY")
+      fatalError("No dictionary")
     }
     
     isRobotRotationEnabled = false
@@ -69,9 +75,11 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
         }
       })]))
     
+    // Save the robot config for the next page.
     PlaygroundKeyValueStore.current["robot"] = .dictionary(robotDictionary)
   }
   
+  /// Converts a robot part config from a string to the correct types
   public func parseRobotConfig(_ config: String) -> (name: RobotNode.Name, color: RobotNode.Color)? {
     let components = config.components(separatedBy: ";")
     
@@ -94,7 +102,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
     case RobotNode.Name.voltBot.rawValue:
       name = .voltBot
     default:
-      fatalError("NAME WHAT?")
+      fatalError("Invalid string.")
     }
     
     switch components[1] {
@@ -105,13 +113,14 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
     case RobotNode.Color.red.rawValue:
       color = .red
     default:
-      fatalError("NAME WHAT?")
+      fatalError("Invalid string.")
     }
     
+    // Checks if the user has customized the robot.
     if name == .boxBot && color == .blue {
       return nil
     }
+    
     return (name, color)
   }
-
 }

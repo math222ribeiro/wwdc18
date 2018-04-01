@@ -1,5 +1,5 @@
 //
-//  GameViewController.swift
+//  RobotLabViewController.swift
 //
 //  Copyright © 2018 Matheus Ribeiro D'Azevedo Lopes. All rights reserved.
 //
@@ -35,6 +35,7 @@ public class RobotLabViewController: UIViewController {
   
   // MARK: UI Properties
   
+  // Frames
   var leftButtonFrame: CGRect!
   var rightButtonFrame: CGRect!
   var centerCardFrame: CGRect!
@@ -86,8 +87,8 @@ public class RobotLabViewController: UIViewController {
     setupViews()
     setRootRobotNode()
     setupAudio()
-    playWelcomeAnimation()
     loadMiniBot()
+    playWelcomeAnimation()
   }
   
   public override func viewDidAppear(_ animated: Bool) {
@@ -108,9 +109,10 @@ public class RobotLabViewController: UIViewController {
     robotListButton.frame = rightButtonFrame
   }
   
+  // MARK: Scene Setups
+  
   public func setupScene() {
     sceneView.scene = scene
-//    sceneView.showsStatistics = true
     mainCamera = scene.rootNode.childNode(named: "camera_i_position")
     secondaryCamera = scene.rootNode.childNode(named: "camera_b")
     ortogonalCamera = scene.rootNode.childNode(named: "camera_o")
@@ -136,10 +138,13 @@ public class RobotLabViewController: UIViewController {
       path = Bundle.main.path(forResource: "success", ofType: "m4a")
       successSoundEffectPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path!))
       successSoundEffectPlayer.volume = 1
+      
+      // Stop the background music when swift playground app is on background
       NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+      // Play the background music when swift playground app is on background
       NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
     } catch {
-      fatalError("Could not load the sounds.")
+      fatalError("Failed to load the sounds.")
     }
   }
   
@@ -151,31 +156,6 @@ public class RobotLabViewController: UIViewController {
   @objc
   public func appDidBecomeActive() {
     backgrounMusicPlayer.play()
-  }
-  
-  func createRobot() {
-    isRobotRotationEnabled = false
-    mainView.isHidden = true
-    lowOpacityView.isHidden = true
-    miniBotTimerAnimation.invalidate()
-    
-    rootRobotNode.runAction(SCNAction.sequence([
-      // Makes the robot face the camera.
-      SCNAction.rotateTo(x: 0, y: CGFloat(initialRobotRotationY), z: 0, duration: 0.3),
-      SCNAction.run({ _ in
-        var robotNode = RobotNode()
-        robotNode.setHead(robotName: .celBot, robotColor: .red)
-        robotNode.setLeg(robotName: .voltBot, robotColor: .blue)
-        robotNode.setBody(robotName: .liamBot, robotColor: .yellow)
-        robotNode.setLeftArm(robotName: .boxBot, robotColor: .yellow)
-        robotNode.setRightArm(robotName: .boxBot, robotColor: .yellow)
-        RobotsManager.shared.setRobotNodeOnScene(robotNode) {
-          self.miniBot.playAnimation(.happy)
-          self.isRobotRotationEnabled = true
-          self.mainView.isHidden = false
-          self.successSoundEffectPlayer.play()
-        }
-      })]))
   }
   
   func loadMiniBot() {
@@ -236,15 +216,15 @@ extension RobotLabViewController {
   /// used for updating the UI when the user change the scene size.
   func updateFrames() {
     rightButtonFrame = CGRect(
-      x: view.bounds.maxX - 30 - 100,
-      y: view.bounds.maxY - 67 - 80,
+      x: view.bounds.maxX - 25 - 90,
+      y: view.bounds.maxY - 67 - 125,
       width: 90,
       height: 67
     )
     
     leftButtonFrame = CGRect(
-      x: 30,
-      y: view.bounds.maxY - 67 - 90,
+      x: 25,
+      y: view.bounds.maxY - 67 - 125,
       width: 90,
       height: 67
     )
@@ -314,7 +294,6 @@ extension RobotLabViewController {
     }
     
     sceneView.pointOfView = currentCamera
-    
   }
   
   public func animateButton(_ button: UIButton, completion: @escaping () -> ()) {
