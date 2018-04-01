@@ -5,12 +5,18 @@ class Listener: PlaygroundRemoteLiveViewProxyDelegate {
   var page: PlaygroundPage!
   
   func remoteLiveViewProxy(_ remoteLiveViewProxy: PlaygroundRemoteLiveViewProxy, received message: PlaygroundValue) {
-    guard case let .dictionary(dict) = message else { return }
-    if case let .string(hint)? = dict["fail"] {
-      page.assessmentStatus = .fail(hints: [hint, hint], solution: nil)
-    } else {
-      page.assessmentStatus = .pass(message: "**Great** job!")
-      page.finishExecution()
+    guard case let .dictionary(dict) = message else {
+
+      return
+    }
+    
+    if case let .boolean(fail)? = dict["fail"] {
+      if fail {
+        page.assessmentStatus = .fail(hints: [Messages.main.rawValue, Messages.customization.rawValue], solution: Messages.example.rawValue)
+      } else {
+        page.assessmentStatus = .pass(message: Messages.pass.rawValue)
+        page.finishExecution()
+      }
     }
   
   }
@@ -20,7 +26,31 @@ class Listener: PlaygroundRemoteLiveViewProxyDelegate {
   }
 }
 
+
+public enum Messages: String {
+  case main = "Try changing everything on your new robot."
+  case customization = """
+Your robot needs to be completely different from blue Box Bot.
+  **Initial configuration is not allowed:**
+- callout(Example):
+  `robot.setHead(fromRobot: .boxBot, ofColor: .blue)`
+"""
+  case example = """
+  `robot.setHead(fromRobot: .boxBot, ofColor: .yellow)
+  robot.setBody(fromRobot: .liamBot, ofColor: .blue)
+  robot.setLeftArm(fromRobot: .macBot, ofColor: .blue)
+  robot.setRightArm(fromRobot: .macBot, ofColor: .blue)
+  robot.setLeg(fromRobot: .boxBot, ofColor: .yellow)`
+"""
+  case pass = """
+  ## Nice!
+  That is a good looking robot, Awesome!
+  [Next Page](@next)
+"""
+}
+
 let page = PlaygroundPage.current
+page.needsIndefiniteExecution = true
 let proxy = page.liveView as! PlaygroundRemoteLiveViewProxy
 let listener = Listener()
 listener.page = page

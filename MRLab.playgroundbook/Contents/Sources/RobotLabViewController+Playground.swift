@@ -28,7 +28,7 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
       guard let headConfig = parseRobotConfig(head), let bodyConfig = parseRobotConfig(body), let armLeftConfig = parseRobotConfig(armLeft),
         let armRightConfig = parseRobotConfig(armRight), let legConfig = parseRobotConfig(leg) else {
           var error = [String: PlaygroundValue]()
-          error["fail"] = .string("HINT HERE")
+          error["fail"] = .boolean(true)
           send(.dictionary(error))
           return
       }
@@ -63,6 +63,9 @@ extension RobotLabViewController: PlaygroundLiveViewMessageHandler {
           self.isRobotRotationEnabled = true
           self.mainView.isHidden = false
           self.successSoundEffectPlayer.play()
+          var error = [String: PlaygroundValue]()
+          error["fail"] = .boolean(false)
+          self.send(.dictionary(error))
         }
       })]))
     
