@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Version</key>
-	<string>1.0</string>
 	<key>Name</key>
-	<string>Second Example Page</string>
+	<string>AR Magic</string>
 	<key>PlaygroundLoggingMode</key>
 	<string>Normal</string>
+	<key>LiveViewEdgeToEdge</key>
+	<true/>
 	<key>LiveViewMode</key>
-	<string>HiddenByDefault</string>
+	<string>VisibleByDefault</string>
 </dict>
 </plist>
