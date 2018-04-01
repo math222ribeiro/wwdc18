@@ -85,9 +85,6 @@ public class RobotLabViewController: UIViewController {
     setupScene()
     setupViews()
     setRootRobotNode()
-//    Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { (_) in
-//      self.createRobot()
-//    }
     setupAudio()
     playWelcomeAnimation()
     loadMiniBot()
@@ -139,9 +136,21 @@ public class RobotLabViewController: UIViewController {
       path = Bundle.main.path(forResource: "success", ofType: "m4a")
       successSoundEffectPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path!))
       successSoundEffectPlayer.volume = 1
+      NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+      NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
     } catch {
       fatalError("Could not load the sounds.")
     }
+  }
+  
+  @objc
+  public func appWillResignActive() {
+    backgrounMusicPlayer.stop()
+  }
+  
+  @objc
+  public func appDidBecomeActive() {
+    backgrounMusicPlayer.play()
   }
   
   func createRobot() {
@@ -171,7 +180,7 @@ public class RobotLabViewController: UIViewController {
   
   func loadMiniBot() {
     miniBot = MiniBot(rootNode: scene.rootNode.childNode(named: "mini-bot"), state: .normal)
-    miniBotTimerAnimation = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { (_) in
+    miniBotTimerAnimation = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { (_) in
       self.miniBot.playAnimation(.idleVariation)
     }
   }
