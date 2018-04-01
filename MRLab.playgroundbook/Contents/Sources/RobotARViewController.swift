@@ -20,7 +20,7 @@ public class RobotARViewController: UIViewController {
   }
   
   var sceneView: ARSCNView!
-  var planeNodes = [SCNNode]()
+  var planeNodes = [SCNNode?]()
   
   var feedbackViewFrame: CGRect!
   var resetButtonFrame: CGRect!
@@ -31,7 +31,7 @@ public class RobotARViewController: UIViewController {
   var resetButton: UIButton!
   var robotButton: UIButton!
   var miniBotButton: UIButton!
-  var tablesButtons: [UIButton]!
+  var currentTableButton: UIButton!
   
   var feedbackView: UIView!
   var feedbackLabel: UILabel!
@@ -46,7 +46,7 @@ public class RobotARViewController: UIViewController {
   
   var miniBotMusicPlayer: AVAudioPlayer!
   var tablesNodes = [SCNNode]()
-  var a = 0
+  var currentTableIndex = 0
   
   // MARK: Life Cycle
   
@@ -69,6 +69,7 @@ public class RobotARViewController: UIViewController {
     loadMiniBot()
     loadTablesNodes()
     setupAudio()
+    didTapSelectCurrentObjectAR(sender: robotButton)
   }
   
   public override func viewWillLayoutSubviews() {
@@ -78,6 +79,8 @@ public class RobotARViewController: UIViewController {
     feedbackView.frame = feedbackViewFrame
     resetButton.frame = resetButtonFrame
     robotButton.frame = topButtonFrame
+    miniBotButton.frame = rightButtonFrame
+    currentTableButton.frame = leftButtonFrame
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -144,15 +147,15 @@ public class RobotARViewController: UIViewController {
     
     rightButtonFrame = CGRect(
       x: view.bounds.maxX - 25 - 70,
-      y: view.bounds.maxY - 67 - 125,
+      y: view.bounds.maxY - 67 - 52,
       width: 70,
       height: 52
     )
     
     leftButtonFrame = CGRect(
       x: 25,
-      y: view.bounds.maxY - 67 - 125,
-      width: 90,
+      y: view.bounds.maxY - 67 - 52,
+      width: 70,
       height: 52
     )
   }
@@ -198,13 +201,22 @@ public class RobotARViewController: UIViewController {
     robotButton.setImage(UIImage(named: "bot_ar_icon"), for: .normal)
     robotButton.addTarget(self, action: #selector(didTapSelectCurrentObjectAR), for: .touchUpInside)
     robotButton.tag = 0
-    robotButton.alpha = 0.8
+    robotButton.alpha = 0.6
     view.addSubview(robotButton)
     
-    miniBotButton = UIButton(frame: leftButtonFrame)
+    miniBotButton = UIButton(frame: rightButtonFrame)
+    miniBotButton.setImage(UIImage(named: "mini_ar_icon"), for: .normal)
+    miniBotButton.addTarget(self, action: #selector(didTapSelectCurrentObjectAR), for: .touchUpInside)
+    miniBotButton.tag = 1
+    miniBotButton.alpha = 0.6
     view.addSubview(miniBotButton)
     
-//    tablesButtons[0] = UIButton(frame: tablesNodes)
+    currentTableButton = UIButton(frame: leftButtonFrame)
+    currentTableButton.setImage(UIImage(named: "table_\(currentTableIndex + 1)"), for: .normal)
+    currentTableButton.addTarget(self, action: #selector(didTapSelectCurrentObjectAR), for: .touchUpInside)
+    currentTableButton.tag = 2
+    currentTableButton.alpha = 0.6
+    view.addSubview(currentTableButton)
     
     let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
     view.addGestureRecognizer(tap)
@@ -213,27 +225,88 @@ public class RobotARViewController: UIViewController {
   @objc
   public func didTapSelectCurrentObjectAR(sender: UIButton) {
     animateButton(sender) {
-      self.selectCurrentObjectAR(sender.tag)
+      if sender.tag == 2 {
+        self.selectCurrentObjectAR(sender.tag + self.currentTableIndex, sender)
+      } else {
+        self.selectCurrentObjectAR(sender.tag, sender)
+      }
+      
     }
   }
   
-  func selectCurrentObjectAR(_ object: Int) {
+  func selectTable() {
+    
+  }
+  
+  func selectCurrentObjectAR(_ object: Int,_ sender: UIButton) {
+    var isTable = false
+    canPlaneNodeShow = true
+
     switch object {
     case ObjectAR.robot.rawValue:
-      robotButton.setImage(UIImage(named: "bot_ar_icon_selected"), for: .normal)
-      robotButton.alpha = 1
       currentObjectARNode = RobotsManager.shared.rootRobotNode!
       currentObjectARNode.scale = SCNVector3(0.36, 0.36, 0.36)
+      currentObjectARNode.eulerAngles = SCNVector3(0, convertToRadians(angle: 90), 0)
     case ObjectAR.miniBot.rawValue:
       currentObjectARNode = miniBot.rootNode
+      currentObjectARNode.eulerAngles = SCNVector3(0, 0, 0)
+      currentObjectARNode.eulerAngles = SCNVector3(0, convertToRadians(angle: 90), 0)
     case ObjectAR.table.rawValue:
       currentObjectARNode = tablesNodes[0]
+      currentObjectARNode.scale = SCNVector3(0.5, 0.5, 0.5)
+      isTable = true
     case ObjectAR.table2.rawValue:
       currentObjectARNode = tablesNodes[1]
+      currentObjectARNode.scale = SCNVector3(0.5, 0.5, 0.5)
+      isTable = true
     case ObjectAR.table3.rawValue:
       currentObjectARNode = tablesNodes[2]
+      currentObjectARNode.scale = SCNVector3(0.5, 0.5, 0.5)
+      isTable = true
     default:
       currentObjectARNode = SCNNode()
+    }
+    
+    if isTable {
+      buttonToggle(tag: object - currentTableIndex)
+    } else {
+      buttonToggle(tag: object)
+    }
+    
+  }
+  
+  func buttonToggle(tag: Int) {
+    if tag == 2 {
+      currentTableIndex += 1
+      if currentTableIndex > 2 { currentTableIndex = 0 }
+    }
+    
+    let robotButtonImageName = "bot_ar_icon"
+    let miniBotButtonImageName = "mini_ar_icon"
+    let tableButtonImageName = "table_\(currentTableIndex + 1)"
+    let selected = "_selected"
+    
+    robotButton.setImage(UIImage(named: robotButtonImageName), for: .normal)
+    robotButton.alpha = 0.6
+    
+    miniBotButton.setImage(UIImage(named: miniBotButtonImageName), for: .normal)
+    miniBotButton.alpha = 0.6
+    
+    currentTableButton.setImage(UIImage(named: tableButtonImageName), for: .normal)
+    currentTableButton.alpha = 0.6
+    
+    switch tag {
+    case 0:
+      robotButton.alpha = 1
+      robotButton.setImage(UIImage(named: robotButtonImageName + selected), for: .normal)
+    case 1:
+      miniBotButton.setImage(UIImage(named: miniBotButtonImageName + selected), for: .normal)
+      miniBotButton.alpha = 1
+    case 2:
+      currentTableButton.alpha = 1
+      currentTableButton.setImage(UIImage(named: tableButtonImageName + selected), for: .normal)
+    default:
+      fatalError("invalid button tag")
     }
   }
   
@@ -261,6 +334,9 @@ public class RobotARViewController: UIViewController {
 
   func setRootRobotNode() {
     RobotsManager.shared.configure(rootRobotNode: Assets.getScene(named: Assets.mainSceneName).rootNode.childNode(named: "robot"), cameraDelegate: nil)
+    if let robot = RobotsManager.shared.getRobotNode(fromPlaygroundMessage: PlaygroundKeyValueStore.current["robot"]) {
+      RobotsManager.shared.setRobot(robot)
+    }
   }
   
   func loadMiniBot() {
@@ -291,23 +367,23 @@ public class RobotARViewController: UIViewController {
   
   func isPlaneNodesHidden(_ hidden: Bool) {
     for node in planeNodes {
-      node.isHidden = hidden
+      node?.isHidden = hidden
     }
   }
   
   private func createRobot(_ position: SCNVector3) -> SCNNode? {
       let node = currentObjectARNode!
+      if node == miniBot.rootNode {
+        miniBotMusicPlayer.play()
+      }
       node.position = position
       return node
   }
 
   func placeRobot(_ result: ARHitTestResult) {
-    let transform = result.worldTransform
-    let planePosition = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
-    guard let robotNode = createRobot(planePosition) else {
-      resetTracking()
-      return
-    }
+    let result = result.worldTransform
+    let planePosition = SCNVector3Make(result.columns.3.x, result.columns.3.y, result.columns.3.z)
+    guard let robotNode = createRobot(planePosition) else { return }
     sceneView.scene.rootNode.addChildNode(robotNode)
     isPlaneNodesHidden(true)
     canPlaneNodeShow = false
@@ -321,6 +397,7 @@ public class RobotARViewController: UIViewController {
     
     canPlaneNodeShow = true
     planeNodes = [SCNNode]()
+    miniBotMusicPlayer.stop()
     
     let configuration = ARWorldTrackingConfiguration()
     configuration.planeDetection = .horizontal

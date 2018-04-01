@@ -8,7 +8,7 @@ extension RobotARViewController: ARSessionDelegate {
     if isRecoverable {
       feedbackLabel.text = "ERROR, TRY RESETTING THE SESSION"
     } else {
-      feedbackLabel.text = "ERROR, TRY RESTARTING THE APP"
+      feedbackLabel.text = "ERROR, CAMERA ACCESS DENIED"
     }
   }
   
